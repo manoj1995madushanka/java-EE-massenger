@@ -5,15 +5,17 @@
  */
 package chatapp.gui;
 
+import chatapp.MessageListener;
+import chatapp.MessageTransmitter;
+import chatapp.WritableGUI;
+
 /**
  *
  * @author USER
  */
-public class MainScreen extends javax.swing.JFrame {
+public class MainScreen extends javax.swing.JFrame implements WritableGUI{
 
-    /**
-     * Creates new form MainScreen
-     */
+    MessageListener listener;
     public MainScreen() {
         initComponents();
     }
@@ -29,9 +31,9 @@ public class MainScreen extends javax.swing.JFrame {
 
         jPanel1 = new javax.swing.JPanel();
         btnListen = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
+        txtRecieve = new javax.swing.JTextField();
+        txtIP = new javax.swing.JTextField();
+        txtTarget = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         txtMessage = new javax.swing.JTextArea();
         txtReply = new javax.swing.JTextField();
@@ -44,12 +46,22 @@ public class MainScreen extends javax.swing.JFrame {
         setForeground(java.awt.Color.black);
 
         btnListen.setText("Listen");
+        btnListen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnListenActionPerformed(evt);
+            }
+        });
 
-        jTextField1.setText("jTextField1");
+        txtRecieve.setText("receivePort");
+        txtRecieve.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtRecieveActionPerformed(evt);
+            }
+        });
 
-        jTextField2.setText("jTextField2");
+        txtIP.setText("IP");
 
-        jTextField3.setText("jTextField3");
+        txtTarget.setText("target port");
 
         txtMessage.setEditable(false);
         txtMessage.setColumns(20);
@@ -83,11 +95,11 @@ public class MainScreen extends javax.swing.JFrame {
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(btnListen)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 207, Short.MAX_VALUE)
-                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(txtRecieve, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(txtIP, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE)
+                        .addGap(18, 18, 18)
+                        .addComponent(txtTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -96,9 +108,9 @@ public class MainScreen extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnListen)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtRecieve, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtIP, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtTarget, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
@@ -131,8 +143,19 @@ public class MainScreen extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSendActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSendActionPerformed
-        // TODO add your handling code here:
+        MessageTransmitter mt=new MessageTransmitter(txtReply.getText(),txtIP.getText(),Integer.parseInt(txtTarget.getText()));
+        mt.start();
     }//GEN-LAST:event_btnSendActionPerformed
+
+    private void txtRecieveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtRecieveActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtRecieveActionPerformed
+
+    private void btnListenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnListenActionPerformed
+        // iniatiaize message listener thread
+        listener=new MessageListener(this,Integer.parseInt(txtRecieve.getText()));
+        listener.start();
+    }//GEN-LAST:event_btnListenActionPerformed
 
     /**
      * @param args the command line arguments
@@ -175,10 +198,15 @@ public class MainScreen extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
+    private javax.swing.JTextField txtIP;
     private javax.swing.JTextArea txtMessage;
+    private javax.swing.JTextField txtRecieve;
     private javax.swing.JTextField txtReply;
+    private javax.swing.JTextField txtTarget;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void write(String s) {
+        txtMessage.append(s+System.lineSeparator());
+    }
 }
